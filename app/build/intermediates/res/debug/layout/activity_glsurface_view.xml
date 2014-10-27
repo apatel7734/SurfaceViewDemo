@@ -1,0 +1,37 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.avgtechie.glsurfaceview.GLSurfaceViewActivity">
+    <!--
+        <com.avgtechie.glsurfaceview.ClearGLSurfaceView
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    -->
+
+    <SurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" />
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Recording"
+        android:onClick="startRecording" />
+
+    <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="wrap_content"
+        android:onClick="stopRecording"
+        android:layout_toRightOf="@id/btn_start"
+        android:text="Stop Recording"
+        android:layout_height="wrap_content" />
+</RelativeLayout>
+<!-- From: file:/Users/ashish/Documents/workspace-studio/SurfaceViewDemo/app/src/main/res/layout/activity_glsurface_view.xml -->
