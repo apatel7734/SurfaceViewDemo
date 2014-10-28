@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.avgtechie.glsurfaceview.GLSurfaceViewActivity">
+    tools:context="com.avgtechie.glsurfaceview.VideoSurfaceViewActivity">
     <!--
         <com.avgtechie.glsurfaceview.ClearGLSurfaceView
             android:id="@+id/surface_view"

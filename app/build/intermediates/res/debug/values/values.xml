@@ -13,6 +13,7 @@
     <string name="app_name">SurfaceViewDemo</string>
     <string name="customize_ball">Customize ball</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_demo_glsurface_view">DemoGLSurfaceViewActivity</string>
     <string name="title_activity_glsurface_view">GLSurfaceViewActivity</string>
     <!-- From: file:/Users/ashish/Documents/workspace-studio/SurfaceViewDemo/app/src/main/res/values/styles.xml -->
     <eat-comment />

@@ -8,12 +8,13 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.avgtechie.surfaceviewdemo.R;
 
 import java.io.File;
 
-public class GLSurfaceViewActivity extends Activity implements SurfaceHolder.Callback, View.OnTouchListener, Choreographer.FrameCallback {
+public class VideoSurfaceViewActivity extends Activity implements SurfaceHolder.Callback, View.OnTouchListener, Choreographer.FrameCallback {
 
     public static final String TAG = "GLSurfaceViewActivity";
     private SurfaceView surfaceView;
@@ -44,11 +45,13 @@ public class GLSurfaceViewActivity extends Activity implements SurfaceHolder.Cal
     public void stopRecording(View view) {
         Log.d(TAG, "stopRecording");
         mRenderThread.stopEncoder();
+        Toast.makeText(this, "Recording Stopped!", Toast.LENGTH_SHORT).show();
     }
 
     public void startRecording(View view) {
         Log.d(TAG, "startRecording");
         mRenderThread.startEncoder();
+        Toast.makeText(this, "Recording Started!", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -57,7 +60,6 @@ public class GLSurfaceViewActivity extends Activity implements SurfaceHolder.Cal
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated()");
         File outputFile = new File(FileUtil.getInstance().getMemeDirPath(), "video-recording.mp4");
-        //File outputFile = new File(getFilesDir(), "video-recording.mp4");
         mRenderThread = new RenderThread(surfaceView.getHolder(), outputFile, this);
         mRenderThread.start();
         try {

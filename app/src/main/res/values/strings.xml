@@ -6,5 +6,6 @@
     <string name="customize_ball">Customize ball</string>
     <string name="title_activity_glsurface_view">GLSurfaceViewActivity</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_demo_glsurface_view">DemoGLSurfaceViewActivity</string>
 
 </resources>

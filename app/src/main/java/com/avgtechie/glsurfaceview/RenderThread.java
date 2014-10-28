@@ -9,10 +9,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-
-import com.avgtechie.surfaceviewdemo.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +60,6 @@ public class RenderThread extends Thread {
     private Sprite2d mEdges[];
     private Sprite2d mRecordRect;
     private float mInnerLeft, mInnerTop, mInnerRight, mInnerBottom;
-    private ImageView mImgView;
     private Rect mVideoRect;
 
 
@@ -78,7 +73,6 @@ public class RenderThread extends Thread {
         mContext = context;
 
         mRect = new Sprite2d(mRectDrawable);
-        mImgView = getNewImageView();
         mIdentityMatrix = new float[16];
         Matrix.setIdentityM(mIdentityMatrix, 0);
 
@@ -88,14 +82,6 @@ public class RenderThread extends Thread {
         }
         mRecordRect = new Sprite2d(mRectDrawable);
         mVideoRect = new Rect();
-    }
-
-    public ImageView getNewImageView() {
-        ImageView imgView = new ImageView(mContext);
-        imgView.setImageResource(R.drawable.ic_launcher);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        imgView.setLayoutParams(params);
-        return imgView;
     }
 
 
