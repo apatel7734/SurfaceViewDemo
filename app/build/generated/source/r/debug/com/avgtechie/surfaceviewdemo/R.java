@@ -23,13 +23,14 @@ public final class R {
         public static final int ic_launcher=0x7f020005;
     }
     public static final class id {
-        public static final int action_settings=0x7f090007;
-        public static final int btn_start=0x7f090003;
-        public static final int btn_stop=0x7f090004;
+        public static final int action_settings=0x7f090008;
+        public static final int btn_start=0x7f090004;
+        public static final int btn_stop=0x7f090005;
         public static final int button_container=0x7f090002;
         public static final int container_layout=0x7f090000;
-        public static final int game=0x7f090005;
-        public static final int menu_settings=0x7f090006;
+        public static final int game=0x7f090006;
+        public static final int menu_settings=0x7f090007;
+        public static final int movie_surface_view=0x7f090003;
         public static final int surface_view=0x7f090001;
     }
     public static final class layout {

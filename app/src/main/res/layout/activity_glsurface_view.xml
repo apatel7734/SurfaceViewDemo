@@ -3,19 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.avgtechie.glsurfaceview.VideoSurfaceViewActivity">
-    <!--
-        <com.avgtechie.glsurfaceview.ClearGLSurfaceView
-            android:id="@+id/surface_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    -->
 
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/button_container"
-        android:layout_alignParentTop="true" />
+        android:layout_above="@+id/button_container" />
+
+    <SurfaceView
+        android:id="@+id/movie_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/button_container" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:text="Text on Top "
+        android:textSize="30sp"
+        android:gravity="center"
+        android:background="@android:color/holo_blue_bright"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@id/button_container"

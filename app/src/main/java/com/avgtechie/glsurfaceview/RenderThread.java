@@ -101,8 +101,10 @@ public class RenderThread extends Thread {
         prepareGl(surface);
     }
 
+    private boolean drawVideo = true;
+
     public void doFrame(long timeStampNanos) {
-        Log.d(TAG, "doFrame() : " + timeStampNanos);
+        //Log.d(TAG, "doFrame() : " + timeStampNanos);
 
         // If we're not keeping up 60fps -- maybe something in the system is busy, maybe
         // recording is too expensive, maybe the CPU frequency governor thinks we're
@@ -117,8 +119,6 @@ public class RenderThread extends Thread {
         // We can reduce the overhead of recording, as well as the size of the movie,
         // by recording at ~30fps instead of the display refresh rate.  As a quick hack
         // we just record every-other frame, using a "recorded previous" flag.
-
-
         update(timeStampNanos);
 /*
             long diff = System.nanoTime() - timeStampNanos;
@@ -133,8 +133,9 @@ public class RenderThread extends Thread {
                 return;
             }
 */
-        boolean swapResult;
 
+
+        boolean swapResult;
         if (mVideoEncoder == null) {
             // Render the scene, swap back to front.
             draw();
@@ -142,7 +143,6 @@ public class RenderThread extends Thread {
         } else {
 
             // recording
-            //Log.d(TAG, "MODE: offscreen + blit 2x");
             // Render offscreen.
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFramebuffer);
             GlUtil.checkGlError("glBindFramebuffer");
@@ -175,31 +175,6 @@ public class RenderThread extends Thread {
             shutdown();
             return;
         }
-
-        // Update the FPS counter.
-        //
-        // Ideally we'd generate something approximate quickly to make the UI look
-        // reasonable, then ease into longer sampling periods.
-        /*
-        final int NUM_FRAMES = 120;
-        final long ONE_TRILLION = 1000000000000L;
-        if (mFpsCountStartNanos == 0) {
-            mFpsCountStartNanos = timeStampNanos;
-            mFpsCountFrame = 0;
-        } else {
-            mFpsCountFrame++;
-            if (mFpsCountFrame == NUM_FRAMES) {
-                // compute thousands of frames per second
-                long elapsed = timeStampNanos - mFpsCountStartNanos;
-                mActivityHandler.sendFpsUpdate((int) (NUM_FRAMES * ONE_TRILLION / elapsed),
-                        mDroppedFrames);
-
-                // reset
-                mFpsCountStartNanos = timeStampNanos;
-                mFpsCountFrame = 0;
-            }
-        }
-        */
     }
 
 
@@ -209,7 +184,7 @@ public class RenderThread extends Thread {
         GlUtil.checkGlError("draw start");
         // Clear to a non-black color to make the content easily differentiable from
         // the pillar-/letter-boxing.
-        GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        //GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         mRect.draw(mProgram, mDisplayProjectionMatrix);
@@ -303,10 +278,13 @@ public class RenderThread extends Thread {
         mProgram = new FlatShadedProgram();
 
         // Set the background color.
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.1f);
 
         // Disable depth testing -- we're 2D only.
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
         // Don't need backface culling.  (If you're feeling pedantic, you can turn it on to
         // make sure we're defining our shapes correctly.)

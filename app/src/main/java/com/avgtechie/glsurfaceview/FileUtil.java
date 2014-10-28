@@ -3,13 +3,14 @@ package com.avgtechie.glsurfaceview;
 import android.os.Environment;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by ashish on 10/26/14.
  */
 public class FileUtil {
     private static FileUtil fileUtil;
+
+    private String fileName = "video-recording.mp4";
 
     public static FileUtil getInstance() {
         if (fileUtil == null) {
@@ -19,32 +20,13 @@ public class FileUtil {
     }
 
     public File getMemeDirPath() {
-        File destDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
-
-        return destDir;
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
     }
 
 
-    public File getMemeFilePath(String fileName) {
+    public File getMemeFilePath() {
         File memeDir = getMemeDirPath();
-        File imageFile = new File(memeDir, fileName);
-        return imageFile;
-    }
-
-    public File createMemeFileIfNotExist(String fileName) {
-        File destDir = getMemeDirPath();
-        if (destDir != null && !destDir.exists()) {
-            destDir.mkdirs();
-        }
-
-        File memeFile = getMemeFilePath(fileName);
-        if (!memeFile.exists()) {
-            try {
-                memeFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return memeFile;
+        File videoFile = new File(memeDir, fileName);
+        return videoFile;
     }
 }
