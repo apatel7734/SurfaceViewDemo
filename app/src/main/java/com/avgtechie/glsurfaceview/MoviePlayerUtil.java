@@ -6,7 +6,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import java.io.File;
-import java.io.IOException;
 
 import gles.EglCore;
 import gles.WindowSurface;
@@ -45,8 +44,11 @@ public class MoviePlayerUtil implements MoviePlayer.PlayerFeedback {
         Surface surface = surfaceHolder.getSurface();
         try {
             File inputMediaFile = FileUtil.getInstance().getMemeFilePath();
+            if (!inputMediaFile.exists()) {
+                return;
+            }
             player = new MoviePlayer(inputMediaFile, surface, callback);
-        } catch (IOException ioe) {
+        } catch (Exception ioe) {
             Log.e(TAG, "Unable to play movie", ioe);
             surface.release();
             return;
