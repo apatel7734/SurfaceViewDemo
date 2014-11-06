@@ -6,6 +6,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.io.IOException;
+
 /**
  * Created by ashish on 10/26/14.
  */
@@ -15,6 +17,7 @@ public class DemoGLSurfaceView extends GLSurfaceView {
 
     public DemoGLSurfaceView(Context context) {
         super(context);
+        //step 1 : setup GLSurfaceView
         setupGLSurfaceView();
     }
 
@@ -25,7 +28,11 @@ public class DemoGLSurfaceView extends GLSurfaceView {
 
     private void setupGLSurfaceView() {
         setEGLContextClientVersion(2);
-        mRenderer = new DemoSurfaceViewRenderer(getHolder(), getContext());
+        try {
+            mRenderer = new DemoSurfaceViewRenderer(getHolder(), getContext());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         setRenderer(mRenderer);
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }

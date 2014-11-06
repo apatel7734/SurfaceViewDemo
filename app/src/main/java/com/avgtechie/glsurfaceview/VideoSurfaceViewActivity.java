@@ -99,7 +99,6 @@ public class VideoSurfaceViewActivity extends Activity implements SurfaceHolder.
                 rh.sendSurfaceChanged(format, width, height);
             }
         }
-
     }
 
     @Override

@@ -36,10 +36,6 @@ public class MoviePlayerUtil implements MoviePlayer.PlayerFeedback {
         Log.d(TAG, "starting movie");
         SpeedControlCallback callback = new SpeedControlCallback();
 
-        // Don't leave the last frame of the previous video hanging on the screen.
-        // Looks weird if the aspect ratio changes.
-        //clearSurface(surface);
-
         MoviePlayer player = null;
         Surface surface = surfaceHolder.getSurface();
         try {
@@ -61,7 +57,7 @@ public class MoviePlayerUtil implements MoviePlayer.PlayerFeedback {
         surfaceHolder.setFixedSize(width, height);
 
         mPlayTask = new MoviePlayer.PlayTask(player, this);
-
+        mPlayTask.setLoopMode(true);
 //        mShowStopLabel = true;
 //        updateControls();
         mPlayTask.execute();

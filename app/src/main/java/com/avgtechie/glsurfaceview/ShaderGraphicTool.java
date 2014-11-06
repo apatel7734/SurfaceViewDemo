@@ -16,7 +16,7 @@ public class ShaderGraphicTool {
      */
     //vertex Solid color
     public static final String vs_SolidColor =
-            "uniform    mat4        uMVPMatrix;" +
+            "uniform mat4 uMVPMatrix;" +
                     "attribute  vec4        vPosition;" +
                     "void main() {" +
                     "  gl_Position = uMVPMatrix * vPosition;" +

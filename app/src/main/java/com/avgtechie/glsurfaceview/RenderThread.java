@@ -3,6 +3,7 @@ package com.avgtechie.glsurfaceview;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Looper;
@@ -44,13 +45,18 @@ public class RenderThread extends Thread {
     private int mFramebuffer;
     private int mDepthBuffer;
     private FullFrameRect mFullScreen;
-
     private long mPrevTimeNanos;
-
     private WindowSurface mInputWindowSurface;
     private TextureMovieEncoder2 mVideoEncoder;
-
     private float mRectVelX, mRectVelY;     // velocity, in viewport units per second
+
+    // FPS / drop counter.
+    private long mRefreshPeriodNanos;
+    private long mFpsCountStartNanos;
+    private int mFpsCountFrame;
+    private int mDroppedFrames;
+    private boolean mPreviousWasDropped;
+    private boolean mRecordedPrevious;
 
     // Orthographic projection matrix.
     private float[] mDisplayProjectionMatrix = new float[16];
@@ -91,13 +97,13 @@ public class RenderThread extends Thread {
         Looper.prepare();
         mHandler = new RenderHandler(this);
         mEglCore = new EglCore(null, EglCore.FLAG_RECORDABLE | EglCore.FLAG_TRY_GLES3);
-
         Looper.loop();
     }
 
     public void surfaceCreated() {
         Log.d(TAG, "surfaceCreated()");
         Surface surface = mSurfaceHolder.getSurface();
+        SurfaceTexture surfaceTexture = new SurfaceTexture(1);
         prepareGl(surface);
     }
 
@@ -120,20 +126,6 @@ public class RenderThread extends Thread {
         // by recording at ~30fps instead of the display refresh rate.  As a quick hack
         // we just record every-other frame, using a "recorded previous" flag.
         update(timeStampNanos);
-/*
-            long diff = System.nanoTime() - timeStampNanos;
-            long max = mRefreshPeriodNanos - 2000000;   // if we're within 2ms, don't bother
-            if (diff > max) {
-                // too much, drop a frame
-                Log.d(TAG, "diff is " + (diff / 1000000.0) + " ms, max " + (max / 1000000.0) +
-                        ", skipping render");
-                mRecordedPrevious = false;
-                mPreviousWasDropped = true;
-                mDroppedFrames++;
-                return;
-            }
-*/
-
 
         boolean swapResult;
         if (mVideoEncoder == null) {
@@ -155,15 +147,21 @@ public class RenderThread extends Thread {
             swapResult = mWindowSurface.swapBuffers();
 
             // Blit to encoder.
-            mVideoEncoder.frameAvailableSoon();
+            //mVideoEncoder.frameAvailableSoon();
             mInputWindowSurface.makeCurrent();
+            //GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            /*
+            GLES20.glEnable(GLES20.GL_BLEND);
+            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+            */
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);    // again, only really need to
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);     //  clear pixels outside rect
             GLES20.glViewport(mVideoRect.left, mVideoRect.top, mVideoRect.width(), mVideoRect.height());
             mFullScreen.drawFrame(mOffscreenTexture, mIdentityMatrix);
             mInputWindowSurface.setPresentationTime(timeStampNanos);
             mInputWindowSurface.swapBuffers();
-
+            // Blit to encoder.
+            mVideoEncoder.frameAvailableSoon();
             // Restore previous values.
             GLES20.glViewport(0, 0, mWindowSurface.getWidth(), mWindowSurface.getHeight());
             mWindowSurface.makeCurrent();
@@ -175,36 +173,37 @@ public class RenderThread extends Thread {
             shutdown();
             return;
         }
+
+        final int NUM_FRAMES = 120;
+        final long ONE_TRILLION = 1000000000000L;
+        if (mFpsCountStartNanos == 0) {
+            mFpsCountStartNanos = timeStampNanos;
+            mFpsCountFrame = 0;
+        } else {
+            mFpsCountFrame++;
+            if (mFpsCountFrame == NUM_FRAMES) {
+                // reset
+                mFpsCountStartNanos = timeStampNanos;
+                mFpsCountFrame = 0;
+            }
+        }
     }
 
 
     public void draw() {
 
-
         GlUtil.checkGlError("draw start");
         // Clear to a non-black color to make the content easily differentiable from
         // the pillar-/letter-boxing.
-        //GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
         mRect.draw(mProgram, mDisplayProjectionMatrix);
-
-
         for (int i = 0; i < 4; i++) {
             mEdges[i].setColor(0.5f, 0.5f, 0.5f);
             mEdges[i].draw(mProgram, mDisplayProjectionMatrix);
         }
-
-
-        // Give a visual indication of the recording method.
-
         mRecordRect.setColor(0.0f, 0.0f, 1.0f);
-
         mRecordRect.draw(mProgram, mDisplayProjectionMatrix);
-
         GlUtil.checkGlError("draw done");
-
-
     }
 
     private void shutdown() {
@@ -310,8 +309,10 @@ public class RenderThread extends Thread {
         final int VIDEO_HEIGHT = 720;
         int windowWidth = mWindowSurface.getWidth();
         int windowHeight = mWindowSurface.getHeight();
+
         float windowAspect = (float) windowHeight / (float) windowWidth;
         int outWidth, outHeight;
+
         if (VIDEO_HEIGHT > VIDEO_WIDTH * windowAspect) {
             // limited by narrow width; reduce height
             outWidth = VIDEO_WIDTH;
@@ -328,12 +329,11 @@ public class RenderThread extends Thread {
 
         VideoEncoderCore encoderCore;
         try {
-            encoderCore = new VideoEncoderCore(VIDEO_WIDTH, VIDEO_HEIGHT,
-                    BIT_RATE, mOutputFile);
+            encoderCore = new VideoEncoderCore(VIDEO_WIDTH, VIDEO_HEIGHT, BIT_RATE, mOutputFile);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        mInputWindowSurface = new WindowSurface(mEglCore, encoderCore.getInputSurface(), true);
+        mInputWindowSurface = new WindowSurface(mEglCore, encoderCore.getInputSurface(), false);
         mVideoEncoder = new TextureMovieEncoder2(encoderCore);
     }
 
@@ -470,4 +470,5 @@ public class RenderThread extends Thread {
 
         GlUtil.checkGlError("prepareFramebuffer done");
     }
+
 }
